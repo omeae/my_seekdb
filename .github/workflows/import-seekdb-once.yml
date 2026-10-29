@@ -20,5 +20,8 @@ jobs:
         run: |
           git clone --branch master --single-branch https://github.com/omeae/seekdb.git source
           cd source
+          rm -rf .github/workflows
+          git add -A
+          git -c user.name=github-actions -c user.email=41898282+github-actions[bot]@users.noreply.github.com commit -m "chore: omit source workflow files for competition import"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/omeae/my_seekdb.git"
           git push origin HEAD:refs/heads/competition-ai

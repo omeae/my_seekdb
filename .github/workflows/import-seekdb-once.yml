@@ -1,0 +1,24 @@
+name: Import seekdb once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/import-seekdb-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy owned fork to a new competition branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone --branch master --single-branch https://github.com/omeae/seekdb.git source
+          cd source
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/omeae/my_seekdb.git"
+          git push origin HEAD:refs/heads/competition-ai

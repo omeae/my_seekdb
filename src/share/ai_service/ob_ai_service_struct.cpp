@@ -113,7 +113,7 @@ int ObAiModelEndpointInfo::check_valid() const
   } else if (url_.empty()) {
     ret = OB_AI_FUNC_PARAM_EMPTY;
     LOG_USER_ERROR(OB_AI_FUNC_PARAM_EMPTY, strlen("url"), "url");
-  } } else if (provider_.empty()) {
+  } else if (provider_.empty()) {
   ret = OB_AI_FUNC_PARAM_EMPTY;
   LOG_USER_ERROR(OB_AI_FUNC_PARAM_EMPTY, strlen("provider"), "provider");
 } else if (!is_valid_provider(provider_)) {

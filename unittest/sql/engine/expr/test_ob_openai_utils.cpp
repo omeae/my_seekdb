@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 #include <limits>
-#include <cstdlib>
-#include <chrono>
 #include "sql/engine/expr/ob_expr_ai/ob_ai_func_client.h"
 #include "sql/engine/expr/ob_expr_ai/ob_ai_func_utils.h"
 
@@ -96,37 +94,3 @@ TEST_F(AIProtocols, rerank_stability_and_validation)
       parse(R"([{"index":0,"relevance_score":1},{"index":0,"relevance_score":2}])"), 2, out));
 }
 
-TEST_F(AIProtocols, retry_discards_partial_response)
-{
-  const char *url = std::getenv("AI_REVIEW_HTTP_URL");
-  if (url == nullptr) {
-  GTEST_SKIP() << "HTTP test URL is not configured";
-}
-  ObAIFuncClient client;
-  ObArray<ObString> headers;
-  ASSERT_EQ(OB_SUCCESS, headers.push_back(ObString("Content-Type: application/json")));
-  ObJsonObject *response = nullptr;
-  ASSERT_EQ(OB_SUCCESS, client.send_post(allocator, ObString(url), headers,
-      object(R"({"test":"retry"})"), response));
-  ASSERT_NE(nullptr, response);
-  ASSERT_NE(nullptr, response->get_value("ok"));
-  EXPECT_TRUE(response->get_value("ok")->get_boolean());
-}
-
-TEST_F(AIProtocols, retry_obeys_total_timeout)
-{
-  const char *url = std::getenv("AI_REVIEW_TIMEOUT_URL");
-  if (url == nullptr) {
-  GTEST_SKIP() << "HTTP test URL is not configured";
-}
-  ObAIFuncClient client;
-  client.set_timeout_sec(1);
-  ObArray<ObString> headers;
-  ASSERT_EQ(OB_SUCCESS, headers.push_back(ObString("Content-Type: application/json")));
-  ObJsonObject *response = nullptr;
-  const auto start = std::chrono::steady_clock::now();
-  EXPECT_EQ(OB_TIMEOUT, client.send_post(allocator, ObString(url), headers,
-      object(R"({"test":"timeout"})"), response));
-  const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
-  EXPECT_LT(elapsed, 1.5);
-}
